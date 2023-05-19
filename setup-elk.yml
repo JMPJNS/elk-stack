@@ -1,7 +1,8 @@
 ---
-- hosts: all
+- name: "Setup ELK Stack"
+  hosts: elk
   roles:
-    - { role: podman, become: yes }
+    - { role: podman, become: true }
   tasks:
     - name: Set max_map_count
       ansible.posix.sysctl:

@@ -1,0 +1,54 @@
+---
+- name: "Setup Go App to test elk logging"
+  hosts: app
+  become: true
+  roles:
+    - aptitude
+  handlers:
+    - name: Start elk-test app
+      ansible.builtin.systemd:
+        name: elk-test
+        state: restarted
+        enabled: true
+  tasks:
+    - name: Create elk-test group
+      ansible.builtin.group:
+        name: elk-test
+        state: present
+
+    - name: Create elk-test user
+      ansible.builtin.user:
+        name: elk-test
+        groups: elk-test
+        shell: /sbin/nologin
+        append: true
+        state: present
+        create_home: false
+
+    - name: Build Go App
+      delegate_to: localhost
+      become: false
+      ansible.builtin.command:
+        chdir: src
+        cmd: go build
+      changed_when: true
+
+    - name: Copy systemd service file to server
+      ansible.builtin.copy:
+        src: src/elk-test.service
+        dest: /etc/systemd/system
+        mode: "0755"
+        owner: root
+        group: root
+      notify:
+        - Start elk-test app
+
+    - name: Copy binary to server
+      ansible.builtin.copy:
+        src: src/elk-test
+        dest: /usr/local/bin
+        mode: "0755"
+        owner: root
+        group: root
+      notify:
+        - Start elk-test app

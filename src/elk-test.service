@@ -1,0 +1,10 @@
+[Unit]
+Description=ELK Stack testing service
+
+[Service]
+User=elk-test
+Group=elk-test
+ExecStart=/usr/local/bin/elk-test
+
+[Install]
+WantedBy=multi-user.target

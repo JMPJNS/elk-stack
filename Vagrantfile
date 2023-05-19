@@ -13,4 +13,9 @@ Vagrant.configure("2") do |config|
     app.vm.hostname = "master"
     app.vm.network :private_network, :ip => "192.168.60.4"
   end
+
+  config.vm.define "app" do |app|
+    app.vm.hostname = "app"
+    app.vm.network :private_network, :ip => "192.168.60.5"
+  end
 end
