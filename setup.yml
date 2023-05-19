@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - podman
+  tasks:
+    - name: Set max_map_count
+      ansible.posix.sysctl:
+        name: vm.max_map_count
+        value: 262144
+        state: present
+    - name: Run ELK Container
+      containers.podman.podman_container:
+        name: elk
+        image: docker.io/sebp/elk
+        state: started
+        expose:
+          - 5601
+          - 9200
+          - 5044
+          - 9300
+          - 9600
+        volumes:
+          - elk-data:/var/lib/elasticsearch
